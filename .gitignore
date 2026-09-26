@@ -1,0 +1,54 @@
+*.iml
+.gradle
+/local.properties
+/.idea/caches
+/.idea/libraries
+/.idea/modules.xml
+/.idea/workspace.xml
+/.idea/navEditor.xml
+/.idea/assetWizardSettings.xml
+.DS_Store
+/build
+/captures
+.externalNativeBuild
+.cxx
+local.properties
+
+# Kotlin compiler cache
+.kotlin/
+
+# More IDE files that are user- or machine-specific
+/.idea/deploymentTargetSelector.xml
+/.idea/deploymentTargetDropDown.xml
+/.idea/other.xml
+/.idea/studiobot.xml
+/.idea/androidTestResultsUserPreferences.xml
+/.idea/shelf/
+/.idea/httpRequests/
+/.idea/dataSources/
+/.idea/dataSources.local.xml
+/.idea/sonarlint/
+/.idea/copilot/
+*.iws
+*.ipr
+
+# Build outputs
+*.apk
+*.aab
+*.ap_
+*.dex
+/app/release/
+/app/debug/
+
+# Signing keys and secrets - never commit these
+*.jks
+*.keystore
+keystore.properties
+secrets.properties
+
+# OS files
+Thumbs.db
+desktop.ini
+
+# Logs
+*.log
