@@ -52,3 +52,6 @@ desktop.ini
 
 # Logs
 *.log
+
+# Per-machine notes for AI agents (e.g. path to the React Native reference app)
+CLAUDE.local.md
