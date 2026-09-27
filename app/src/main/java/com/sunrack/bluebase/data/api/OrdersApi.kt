@@ -4,6 +4,7 @@ import com.sunrack.bluebase.data.model.KitInfo
 import com.sunrack.bluebase.data.model.KitScanDetailsResponse
 import com.sunrack.bluebase.data.model.Order
 import com.sunrack.bluebase.data.model.ProductKit
+import com.sunrack.bluebase.data.model.SavedOrder
 import com.sunrack.bluebase.data.model.WarrantyDashboardCounts
 import retrofit2.http.GET
 import retrofit2.http.Path
@@ -26,4 +27,7 @@ interface OrdersApi {
 
     @GET("kit-scan-details/{scan_id}/")
     suspend fun kitScanDetails(@Path("scan_id") scanId: String): KitScanDetailsResponse
+
+    @GET("saved-orders/")
+    suspend fun savedOrders(): List<SavedOrder>
 }

@@ -17,6 +17,7 @@ import kotlinx.serialization.Serializable
 @Serializable object ClientWarrantyRoute
 @Serializable object ClientClaimFormRoute
 @Serializable data class ClientWarrantyStatusPageRoute(val warReqId: String)
+@Serializable data class ClientWarrantyCardRoute(val warReqId: String)
 @Serializable object ClientProductInfoRoute
 @Serializable object ClientInstallationManualRoute
 @Serializable object ClientAboutRoute

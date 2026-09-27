@@ -24,8 +24,9 @@ import androidx.navigation.toRoute
 import com.sunrack.bluebase.core.di.AppContainer
 import com.sunrack.bluebase.ui.components.BluebaseTopBar
 import com.sunrack.bluebase.ui.components.PlaceholderScreen
-import com.sunrack.bluebase.ui.feature.client.dashboard.DashboardHomeScreen
 import com.sunrack.bluebase.ui.feature.client.dashboard.DashboardHomeViewModel
+import com.sunrack.bluebase.ui.feature.client.dashboard.DashboardTabsScreen
+import com.sunrack.bluebase.ui.feature.client.dashboard.MyScansViewModel
 import com.sunrack.bluebase.ui.feature.client.kitdetails.ClientKitDetailsScreen
 import com.sunrack.bluebase.ui.feature.client.kitdetails.ClientKitDetailsViewModel
 import com.sunrack.bluebase.ui.feature.client.orders.ClientOrderDetailsScreen
@@ -36,6 +37,13 @@ import com.sunrack.bluebase.ui.feature.client.productinfo.ProductInfoScreen
 import com.sunrack.bluebase.ui.feature.client.productinfo.ProductInfoViewModel
 import com.sunrack.bluebase.ui.feature.client.scanner.QrScannerScreen
 import com.sunrack.bluebase.ui.feature.client.scanner.QrScannerViewModel
+import com.sunrack.bluebase.ui.feature.client.warranty.ClaimStatusViewModel
+import com.sunrack.bluebase.ui.feature.client.warranty.MyWarrantyCardsViewModel
+import com.sunrack.bluebase.ui.feature.client.warranty.WarrantyCardDetailScreen
+import com.sunrack.bluebase.ui.feature.client.warranty.WarrantyCardDetailViewModel
+import com.sunrack.bluebase.ui.feature.client.warranty.WarrantyStatusPageScreen
+import com.sunrack.bluebase.ui.feature.client.warranty.WarrantyStatusPageViewModel
+import com.sunrack.bluebase.ui.feature.client.warranty.WarrantyTabsScreen
 import kotlinx.coroutines.launch
 
 /** The client (main) section: dark drawer + yellow top bar + its own nested NavHost, replacing the RN `(main)` Drawer stack. */
@@ -90,11 +98,15 @@ fun ClientShell(appContainer: AppContainer) {
                 modifier = Modifier.fillMaxSize().padding(innerPadding),
             ) {
                 composable<ClientDashboardRoute> {
-                    DashboardHomeScreen(
+                    DashboardTabsScreen(
                         user = user,
                         onScanClick = { navController.navigate(ClientQrScannerRoute) },
-                        viewModel = viewModel(factory = viewModelFactory {
+                        onGoToKitDetails = { scanId -> navController.navigate(ClientKitDetailsRoute(scanId = scanId)) },
+                        homeViewModel = viewModel(factory = viewModelFactory {
                             initializer { DashboardHomeViewModel(appContainer.ordersApi) }
+                        }),
+                        myScansViewModel = viewModel(factory = viewModelFactory {
+                            initializer { MyScansViewModel(appContainer.ordersApi, appContainer.warrantyApi) }
                         }),
                     )
                 }
@@ -142,9 +154,35 @@ fun ClientShell(appContainer: AppContainer) {
                         }),
                     )
                 }
-                composable<ClientWarrantyRoute> { PlaceholderScreen("Warranty") }
+                composable<ClientWarrantyRoute> {
+                    WarrantyTabsScreen(
+                        onViewDetails = { warReqId -> navController.navigate(ClientWarrantyStatusPageRoute(warReqId)) },
+                        onViewCard = { warReqId -> navController.navigate(ClientWarrantyCardRoute(warReqId)) },
+                        claimStatusViewModel = viewModel(factory = viewModelFactory {
+                            initializer { ClaimStatusViewModel(appContainer.warrantyApi) }
+                        }),
+                        myWarrantyCardsViewModel = viewModel(factory = viewModelFactory {
+                            initializer { MyWarrantyCardsViewModel(appContainer.warrantyApi) }
+                        }),
+                    )
+                }
                 composable<ClientClaimFormRoute> { PlaceholderScreen("Claim Warranty") }
-                composable<ClientWarrantyStatusPageRoute> { PlaceholderScreen("Warranty Status") }
+                composable<ClientWarrantyStatusPageRoute> { entry ->
+                    val route = entry.toRoute<ClientWarrantyStatusPageRoute>()
+                    WarrantyStatusPageScreen(
+                        viewModel = viewModel(factory = viewModelFactory {
+                            initializer { WarrantyStatusPageViewModel(appContainer.warrantyApi, route.warReqId) }
+                        }),
+                    )
+                }
+                composable<ClientWarrantyCardRoute> { entry ->
+                    val route = entry.toRoute<ClientWarrantyCardRoute>()
+                    WarrantyCardDetailScreen(
+                        viewModel = viewModel(factory = viewModelFactory {
+                            initializer { WarrantyCardDetailViewModel(appContainer.warrantyApi, route.warReqId) }
+                        }),
+                    )
+                }
                 composable<ClientProductInfoRoute> {
                     ProductInfoScreen(
                         viewModel = viewModel(factory = viewModelFactory {
@@ -169,6 +207,8 @@ private val CLIENT_ROUTE_MATCHERS: List<Pair<Any, String>> = listOf(
     ClientKitDetailsRoute() to "Kit Details",
     ClientWarrantyRoute to "Warranty",
     ClientClaimFormRoute to "Claim Warranty",
+    ClientWarrantyStatusPageRoute("") to "Warranty Details",
+    ClientWarrantyCardRoute("") to "Warranty Card",
     ClientProductInfoRoute to "Product Info",
     ClientInstallationManualRoute to "Installation Manual",
     ClientAboutRoute to "About",
