@@ -11,15 +11,29 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.lifecycle.viewmodel.initializer
+import androidx.lifecycle.viewmodel.viewModelFactory
 import androidx.navigation.NavDestination.Companion.hasRoute
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.toRoute
 import com.sunrack.bluebase.core.di.AppContainer
 import com.sunrack.bluebase.ui.components.BluebaseTopBar
 import com.sunrack.bluebase.ui.components.PlaceholderScreen
+import com.sunrack.bluebase.ui.feature.client.dashboard.DashboardHomeScreen
+import com.sunrack.bluebase.ui.feature.client.dashboard.DashboardHomeViewModel
+import com.sunrack.bluebase.ui.feature.client.kitdetails.ClientKitDetailsScreen
+import com.sunrack.bluebase.ui.feature.client.kitdetails.ClientKitDetailsViewModel
+import com.sunrack.bluebase.ui.feature.client.orders.ClientOrderDetailsScreen
+import com.sunrack.bluebase.ui.feature.client.orders.ClientOrderDetailsViewModel
+import com.sunrack.bluebase.ui.feature.client.orders.ClientOrdersScreen
+import com.sunrack.bluebase.ui.feature.client.orders.ClientOrdersViewModel
+import com.sunrack.bluebase.ui.feature.client.productinfo.ProductInfoScreen
+import com.sunrack.bluebase.ui.feature.client.productinfo.ProductInfoViewModel
 import kotlinx.coroutines.launch
 
 /** The client (main) section: dark drawer + yellow top bar + its own nested NavHost, replacing the RN `(main)` Drawer stack. */
@@ -73,10 +87,62 @@ fun ClientShell(appContainer: AppContainer) {
                 startDestination = ClientDashboardRoute,
                 modifier = Modifier.fillMaxSize().padding(innerPadding),
             ) {
-                composable<ClientDashboardRoute> { PlaceholderScreen("Dashboard") }
-                composable<ClientOrdersRoute> { PlaceholderScreen("All Orders") }
+                composable<ClientDashboardRoute> {
+                    DashboardHomeScreen(
+                        user = user,
+                        onScanClick = { navController.navigate(ClientQrScannerRoute) },
+                        viewModel = viewModel(factory = viewModelFactory {
+                            initializer { DashboardHomeViewModel(appContainer.ordersApi) }
+                        }),
+                    )
+                }
+                composable<ClientQrScannerRoute> { PlaceholderScreen("QR Scanner") }
+                composable<ClientOrdersRoute> {
+                    ClientOrdersScreen(
+                        onViewDetails = { orderId -> navController.navigate(ClientOrderDetailsRoute(orderId)) },
+                        viewModel = viewModel(factory = viewModelFactory {
+                            initializer { ClientOrdersViewModel(appContainer.ordersApi) }
+                        }),
+                    )
+                }
+                composable<ClientOrderDetailsRoute> { entry ->
+                    val route = entry.toRoute<ClientOrderDetailsRoute>()
+                    ClientOrderDetailsScreen(
+                        viewModel = viewModel(factory = viewModelFactory {
+                            initializer { ClientOrderDetailsViewModel(appContainer.ordersApi, route.orderId) }
+                        }),
+                    )
+                }
+                composable<ClientKitDetailsRoute> { entry ->
+                    val route = entry.toRoute<ClientKitDetailsRoute>()
+                    ClientKitDetailsScreen(
+                        user = user,
+                        onRequestWarranty = { navController.navigate(ClientClaimFormRoute) },
+                        onShowWarrantyStatus = { warReqId -> navController.navigate(ClientWarrantyStatusPageRoute(warReqId)) },
+                        viewModel = viewModel(factory = viewModelFactory {
+                            initializer {
+                                ClientKitDetailsViewModel(
+                                    appContainer.ordersApi,
+                                    appContainer.warrantyApi,
+                                    route.kitId,
+                                    route.scanId,
+                                    route.allScanned,
+                                    route.totalKits,
+                                )
+                            }
+                        }),
+                    )
+                }
                 composable<ClientWarrantyRoute> { PlaceholderScreen("Warranty") }
-                composable<ClientProductInfoRoute> { PlaceholderScreen("Product Info") }
+                composable<ClientClaimFormRoute> { PlaceholderScreen("Claim Warranty") }
+                composable<ClientWarrantyStatusPageRoute> { PlaceholderScreen("Warranty Status") }
+                composable<ClientProductInfoRoute> {
+                    ProductInfoScreen(
+                        viewModel = viewModel(factory = viewModelFactory {
+                            initializer { ProductInfoViewModel(appContainer.ordersApi) }
+                        }),
+                    )
+                }
                 composable<ClientInstallationManualRoute> { PlaceholderScreen("Installation Manual") }
                 composable<ClientAboutRoute> { PlaceholderScreen("About") }
                 composable<ClientSettingsRoute> { PlaceholderScreen("Settings") }
@@ -88,8 +154,12 @@ fun ClientShell(appContainer: AppContainer) {
 
 private val CLIENT_ROUTE_MATCHERS: List<Pair<Any, String>> = listOf(
     ClientDashboardRoute to "Dashboard",
+    ClientQrScannerRoute to "Scan QR Code",
     ClientOrdersRoute to "All Orders",
+    ClientOrderDetailsRoute("") to "Order Details",
+    ClientKitDetailsRoute() to "Kit Details",
     ClientWarrantyRoute to "Warranty",
+    ClientClaimFormRoute to "Claim Warranty",
     ClientProductInfoRoute to "Product Info",
     ClientInstallationManualRoute to "Installation Manual",
     ClientAboutRoute to "About",
