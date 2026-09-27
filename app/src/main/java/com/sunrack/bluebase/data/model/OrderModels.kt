@@ -2,12 +2,17 @@ package com.sunrack.bluebase.data.model
 
 import kotlinx.serialization.Serializable
 
-/** The backend's Kit serializer shape — used standalone (`/kit/{kit_id}/`) and nested in order items. */
+/**
+ * The backend's Kit serializer shape — used standalone (`/kit/{kit_id}/`) and nested in order items.
+ * `clearance` and `price` are Django `DecimalField`s, which DRF serializes as JSON *strings*
+ * (e.g. `"clearance":"6.5"`) even though they're numeric — kept as String here to match the wire
+ * format exactly rather than relying on serializer leniency.
+ */
 @Serializable
 data class KitInfo(
     val kit_id: String? = null,
     val tilt_angle: Double? = null,
-    val clearance: Double? = null,
+    val clearance: String? = null,
     val configuration: String? = null,
     val num_panels: Int? = null,
     val region: String? = null,
@@ -17,7 +22,7 @@ data class KitInfo(
 
 @Serializable
 data class OrderItem(
-    val id: String,
+    val id: Int,
     val kit: KitInfo,
     val quantity: Int,
     val unit_price: String? = null,

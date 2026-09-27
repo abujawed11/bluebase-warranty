@@ -48,7 +48,7 @@ class ProductInfoViewModel(private val ordersApi: OrdersApi) : ViewModel() {
                         else -> "Matrix – ${kit.tilt_angle ?: "?"}° Tilt"
                     }
                     val region = kit.region ?: "Other Regions"
-                    val clearanceStr = "${kit.clearance ?: 0.0} ft"
+                    val clearanceStr = "${kit.clearance ?: "-"} ft"
                     val panelsStr = "${kit.num_panels} ${if (kit.num_panels > 1) "Panels" else "Panel"}"
                     grouped.getOrPut(matrixLabel to region) { mutableListOf() }
                         .add(ProductKitRow(clearanceStr, kit.configuration ?: "-", panelsStr))
