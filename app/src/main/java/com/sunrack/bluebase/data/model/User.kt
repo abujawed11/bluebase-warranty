@@ -9,6 +9,8 @@ data class User(
     val email: String,
     val client_id: String,
     val account_type: String,
-    val is_active: Boolean,
+    // The backend doesn't always include this field (e.g. it's absent from /token/'s response) —
+    // default to true rather than fail deserialization, matching TS's implicit leniency here.
+    val is_active: Boolean = true,
     val company_name: String,
 )
