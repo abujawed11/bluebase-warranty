@@ -7,6 +7,7 @@ import com.sunrack.bluebase.core.network.NetworkModule
 import com.sunrack.bluebase.data.api.AuthApi
 import com.sunrack.bluebase.data.api.NotificationsApi
 import com.sunrack.bluebase.data.api.OrdersApi
+import com.sunrack.bluebase.data.api.ScannerApi
 import com.sunrack.bluebase.data.api.WarrantyApi
 
 /**
@@ -26,4 +27,5 @@ class AppContainer(context: Context) {
     val notificationsApi: NotificationsApi by lazy { authenticatedRetrofit.create(NotificationsApi::class.java) }
     val ordersApi: OrdersApi by lazy { authenticatedRetrofit.create(OrdersApi::class.java) }
     val warrantyApi: WarrantyApi by lazy { authenticatedRetrofit.create(WarrantyApi::class.java) }
+    val scannerApi: ScannerApi by lazy { authenticatedRetrofit.create(ScannerApi::class.java) }
 }

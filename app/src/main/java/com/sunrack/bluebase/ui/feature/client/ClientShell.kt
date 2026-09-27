@@ -34,6 +34,8 @@ import com.sunrack.bluebase.ui.feature.client.orders.ClientOrdersScreen
 import com.sunrack.bluebase.ui.feature.client.orders.ClientOrdersViewModel
 import com.sunrack.bluebase.ui.feature.client.productinfo.ProductInfoScreen
 import com.sunrack.bluebase.ui.feature.client.productinfo.ProductInfoViewModel
+import com.sunrack.bluebase.ui.feature.client.scanner.QrScannerScreen
+import com.sunrack.bluebase.ui.feature.client.scanner.QrScannerViewModel
 import kotlinx.coroutines.launch
 
 /** The client (main) section: dark drawer + yellow top bar + its own nested NavHost, replacing the RN `(main)` Drawer stack. */
@@ -96,7 +98,14 @@ fun ClientShell(appContainer: AppContainer) {
                         }),
                     )
                 }
-                composable<ClientQrScannerRoute> { PlaceholderScreen("QR Scanner") }
+                composable<ClientQrScannerRoute> {
+                    QrScannerScreen(
+                        onNavigateToKitDetails = { route -> navController.navigate(route) },
+                        viewModel = viewModel(factory = viewModelFactory {
+                            initializer { QrScannerViewModel(appContainer.scannerApi) }
+                        }),
+                    )
+                }
                 composable<ClientOrdersRoute> {
                     ClientOrdersScreen(
                         onViewDetails = { orderId -> navController.navigate(ClientOrderDetailsRoute(orderId)) },
