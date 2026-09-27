@@ -5,6 +5,7 @@ import com.sunrack.bluebase.core.auth.SessionManager
 import com.sunrack.bluebase.core.auth.TokenStore
 import com.sunrack.bluebase.core.network.NetworkModule
 import com.sunrack.bluebase.data.api.AuthApi
+import com.sunrack.bluebase.data.api.NotificationsApi
 
 /**
  * Hand-rolled dependency container (no Hilt/KSP), created once in [com.sunrack.bluebase.BluebaseApp].
@@ -19,4 +20,6 @@ class AppContainer(context: Context) {
     val sessionManager = SessionManager(tokenStore, authApi)
 
     val authenticatedRetrofit by lazy { NetworkModule.authenticatedRetrofit(sessionManager) }
+
+    val notificationsApi: NotificationsApi by lazy { authenticatedRetrofit.create(NotificationsApi::class.java) }
 }

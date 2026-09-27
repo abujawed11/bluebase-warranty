@@ -9,13 +9,14 @@ import kotlinx.serialization.Serializable
 @Serializable object RegisterRoute
 @Serializable object ForgotPasswordRoute
 
-// Placeholders until Phase 3 (Navigation shell) replaces these with the real drawers/stacks.
-@Serializable object ClientHomeRoute
-@Serializable object AdminHomeRoute
-@Serializable object DeveloperHomeRoute
+// Each section owns a nested NavHost of its own (see ClientShell/AdminShell/DeveloperShell);
+// these are just the top-level entry points the root NavHost redirects to by role.
+@Serializable object ClientSectionRoute
+@Serializable object AdminSectionRoute
+@Serializable object DeveloperSectionRoute
 
 fun User.startRoute(): Any = when (startSection()) {
-    StartSection.Developer -> DeveloperHomeRoute
-    StartSection.Admin -> AdminHomeRoute
-    StartSection.Client -> ClientHomeRoute
+    StartSection.Developer -> DeveloperSectionRoute
+    StartSection.Admin -> AdminSectionRoute
+    StartSection.Client -> ClientSectionRoute
 }
