@@ -296,6 +296,7 @@ Done:
 - [x] `ui/theme` with brand colors; `MainActivity` shows a placeholder "Bluebase Warranty" screen
 - [x] `.gitignore` hardened (keystores, APK/AAB, IDE files, `CLAUDE.local.md`)
 - [x] `./gradlew assembleDebug testDebugUnitTest` passes
+- [x] **Phase 1 (Foundation):** Retrofit + OkHttp + kotlinx.serialization + Coil3 + DataStore + `androidx.security-crypto` added to `gradle/libs.versions.toml`. `BuildConfig.BASE_URL` / `DOC_BASE_URL`. `TokenStore` (EncryptedSharedPreferences, mirrors the `access`/`refresh`/`user` SecureStore keys). `SessionManager` (`StateFlow<User?>`, login/refresh/logout, proactive refresh 10s before JWT `exp`, mutex-coalesced refresh). `AuthInterceptor` + `TokenAuthenticator` (refresh-once-on-401 via a second, unauthenticated Retrofit client used only for `/token/*`, avoiding a circular dependency). `BluebaseApp` + a small hand-rolled `AppContainer` for DI — **Hilt was skipped** in favor of manual DI per §6's "or manual DI" option, to avoid pinning a KSP version alongside the already-finicky AGP/Kotlin/Compose versions (§8).
 
 Nothing else is implemented yet.
 
