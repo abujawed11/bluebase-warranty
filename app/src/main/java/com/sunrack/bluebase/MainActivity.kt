@@ -6,44 +6,24 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
+import androidx.compose.material3.Surface
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
+import com.sunrack.bluebase.ui.navigation.BluebaseNavHost
 import com.sunrack.bluebase.ui.theme.BluebaseTheme
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+        val appContainer = (application as BluebaseApp).container
         setContent {
             BluebaseTheme {
-                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    WelcomeScreen(modifier = Modifier.padding(innerPadding))
+                Surface(modifier = Modifier.fillMaxSize()) {
+                    Box(modifier = Modifier.fillMaxSize()) {
+                        BluebaseNavHost(appContainer)
+                    }
                 }
             }
         }
-    }
-}
-
-@Composable
-fun WelcomeScreen(modifier: Modifier = Modifier) {
-    Box(modifier = modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-        Text(
-            text = "Bluebase Warranty",
-            style = MaterialTheme.typography.headlineMedium,
-        )
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
-private fun WelcomeScreenPreview() {
-    BluebaseTheme {
-        WelcomeScreen()
     }
 }

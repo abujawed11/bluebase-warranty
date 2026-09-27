@@ -14,7 +14,7 @@ import com.sunrack.bluebase.data.api.AuthApi
 class AppContainer(context: Context) {
     private val tokenStore = TokenStore(context.applicationContext)
 
-    private val authApi: AuthApi = NetworkModule.unauthenticatedRetrofit.create(AuthApi::class.java)
+    val authApi: AuthApi = NetworkModule.unauthenticatedRetrofit.create(AuthApi::class.java)
 
     val sessionManager = SessionManager(tokenStore, authApi)
 

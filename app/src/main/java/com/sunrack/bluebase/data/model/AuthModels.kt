@@ -30,3 +30,31 @@ data class RefreshResponse(
 data class LogoutRequest(
     val refresh: String,
 )
+
+@Serializable
+data class SendOtpRequest(
+    val email: String,
+    val purpose: String,
+)
+
+@Serializable
+data class VerifyOtpRequest(
+    val email: String,
+    val otp: String,
+)
+
+@Serializable
+data class ResetPasswordRequest(
+    val email: String,
+    val password: String,
+)
+
+@Serializable
+data class RegisterRequest(
+    val client_id: String,
+    val username: String,
+    val email: String,
+    val password: String,
+    val otp: String,
+)
+

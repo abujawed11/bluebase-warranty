@@ -54,10 +54,20 @@ class SessionManager(
         _loading.value = false
     }
 
-    suspend fun login(username: String, password: String): Result<User> = runCatching {
-        val response = authApi.login(LoginRequest(username, password))
-        persistSession(response.access, response.refresh, response.user)
-        response.user
+    /**
+     * On failure this always fails with the literal message "Login failed", regardless of the
+     * actual backend reason (wrong password, inactive account, etc) — matching `AuthContext.tsx`'s
+     * `login()`, which discards the real error and always throws `new Error('Login failed')`.
+     * This looks like a UX bug in the reference app, ported as-is per CLAUDE.md rule 1.
+     */
+    suspend fun login(username: String, password: String): Result<User> {
+        return try {
+            val response = authApi.login(LoginRequest(username, password))
+            persistSession(response.access, response.refresh, response.user)
+            Result.success(response.user)
+        } catch (e: Exception) {
+            Result.failure(Exception("Login failed", e))
+        }
     }
 
     /**
